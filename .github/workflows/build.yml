@@ -1,0 +1,35 @@
+
+name: Build C++ EXE
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Compile C++ (64-bit)
+        shell: cmd
+        run: |
+          g++ --version
+          g++ -std=c++17 -O2 -static -static-libgcc -static-libstdc++ main.cpp -o MyProgram.exe
+
+      - name: Verify EXE
+        shell: cmd
+        run: |
+          if not exist MyProgram.exe exit /b 1
+          dir MyProgram.exe
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyProgram-Windows-x64
+          path: MyProgram.exe
+          if-no-files-found: error
